@@ -1,0 +1,92 @@
+C51 COMPILER V9.50a   MAIN                                                                 11/04/2019 21:29:50 PAGE 1   
+
+
+C51 COMPILER V9.50a, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN main.OBJ
+COMPILER INVOKED BY: D:\KeilC51\C51\BIN\C51.EXE main.c BROWSE INCDIR(.\driver) DEBUG OBJECTEXTEND TABS(2)
+
+line level    source
+
+   1          #include "reg52.h"
+   2          #include "stdio.h"
+   3          #include "uart.h"
+   4          #include "intrins.h"
+   5          #include "delay.h"
+   6          #include "lcd1602.h"
+   7          
+   8          sbit LED = P1^0;//LED
+   9          sbit Voice = P1^1;
+  10          sbit BEEP = P3^6 ;   //蜂鸣器
+  11          unsigned char  rxlengh = 0; 
+  12          unsigned char  Count1,Count2,flag;
+  13          void Timer0_init();
+  14          
+  15          void main()
+  16          {
+  17   1         unsigned char i = 0;
+  18   1         UartInit();//115200
+  19   1         init_1602();//初始化LCD1602
+  20   1         Timer0_init();
+  21   1         write_string(0,0,"QR code:",8);
+  22   1         while(1)
+  23   1         {
+  24   2           Is_Receive_Ok(&rxlengh);//判断串口是否接收完成
+  25   2           if(rxlengh !=0)
+  26   2           {
+  27   3             if(rxlengh <= 20) 
+  28   3             {
+  29   4               write_string(0,1,Receive_Data,16);//在屏幕上显示解码后的数据
+  30   4               Voice = 0; 
+  31   4               delay_us(10);
+  32   4               Voice = 1;   
+  33   4             }         
+  34   3             else
+  35   3             {           
+  36   4               write_string(0,1,"QRcode too large",16);//码太长 无法显示
+  37   4             }
+  38   3             TR0 = 1;
+  39   3             delay_ms(30);
+  40   3             TR0 = 0;            
+  41   3             receive_ok = 0;
+  42   3             uart_len = 0;//标志位清0 开启下一次接收
+  43   3           }
+  44   2           LED = !LED; //LED闪烁 表示系统正在运行
+  45   2           
+  46   2         }
+  47   1      }
+  48          
+  49          void Timer0_init()
+  50          {
+  51   1         TMOD=0x01; 
+  52   1         TH0=0xfc; 
+  53   1         TL0=0x66;      //1ms定时 
+  54   1         EA=1; 
+  55   1         ET0=1; 
+C51 COMPILER V9.50a   MAIN                                                                 11/04/2019 21:29:50 PAGE 2   
+
+  56   1      }
+  57          
+  58          
+  59          /*********************************************************
+  60            Time0中断函数
+  61          **********************************************************/
+  62          void Time0(void) interrupt 1 using 0
+  63          {
+  64   1         TH0=0xfc;               //1ms定时
+  65   1         TL0=0x66;
+  66   1         BEEP=~BEEP;     
+  67   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    133    ----
+   CONSTANT SIZE    =     26    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      4       1
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

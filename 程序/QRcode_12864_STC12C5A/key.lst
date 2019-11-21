@@ -1,0 +1,221 @@
+C51 COMPILER V9.50a   KEY                                                                  10/27/2019 21:58:17 PAGE 1   
+
+
+C51 COMPILER V9.50a, COMPILATION OF MODULE KEY
+OBJECT MODULE PLACED IN key.obj
+COMPILER INVOKED BY: D:\KeilC51\C51\BIN\C51.EXE driver\key.c BROWSE INCDIR(.\driver) DEBUG OBJECTEXTEND PRINT(.\key.lst)
+                    - TABS(2) OBJECT(key.obj)
+
+line level    source
+
+   1          #include <STC12C5A60S2.H>
+   2          #include "key.h"
+   3          #include "stdio.h"
+   4          
+   5          
+   6          
+   7          
+   8          static unsigned char KEY0_ReadPin(void)
+   9          {
+  10   1          return _KEY0;
+  11   1      }
+  12          
+  13          static unsigned char KEY1_ReadPin(void)
+  14          {
+  15   1          return _KEY1;
+  16   1      }
+  17          
+  18          static unsigned char KEY2_ReadPin(void)
+  19          {
+  20   1          return _KEY2;
+  21   1      }
+  22          
+  23          static unsigned char KEY3_ReadPin(void)
+  24          {
+  25   1          return _KEY3;
+  26   1      }
+  27          
+  28          
+  29          KEY_COMPONENTS Key_Buf[KEY_NUM] = {
+  30          {1,0,0,0,KEY_NULL,KEY_NULL,KEY0_ReadPin},
+  31          {1,0,0,0,KEY_NULL,KEY_NULL,KEY1_ReadPin},
+  32          {1,0,0,0,KEY_NULL,KEY_NULL,KEY2_ReadPin},
+  33          {1,0,0,0,KEY_NULL,KEY_NULL,KEY3_ReadPin},
+  34          };//µÚËÄ¸ö²ÎÊýKEY_DOWN_LEVEL±íÊ¾°´¼ü°´ÏÂÊ±IO¿ÚµÄµçÆ½  0£ºµÍµçÆ½  1£º¸ßµçÆ½  ÎÒµÄµçÂ·°´¼ü°´ÏÂÊÇµÍµçÆ½ ËùÒÔÕ
+             -âÀïÉèÖÃÎª0
+  35          
+  36          //ÂÖÑ¯Ã¿¸ö°´¼üµÄµçÆ½ ²¢¸³Öµ¸ø¶ÔÓ¦µÄÐéÄâµçÆ½  
+  37          static void Get_Key_Level(void)
+  38          {
+  39   1          unsigned char i;
+  40   1          
+  41   1          for(i = 0;i < KEY_NUM;i++)
+  42   1          {
+  43   2              if(Key_Buf[i].KEY_SHIELD == 0)
+  44   2                  continue;
+  45   2              if(Key_Buf[i].READ_PIN() == Key_Buf[i].KEY_DOWN_LEVEL)
+  46   2                  Key_Buf[i].KEY_LEVEL = 1;//ÐéÄâµçÆ½ 1£º°´ÏÂ 0£ºÌ§Æð
+  47   2              else
+  48   2                  Key_Buf[i].KEY_LEVEL = 0;
+  49   2          }
+  50   1      }
+  51          
+  52          void ReadKeyStatus(void)
+  53          {
+C51 COMPILER V9.50a   KEY                                                                  10/27/2019 21:58:17 PAGE 2   
+
+  54   1          unsigned char i;
+  55   1          
+  56   1          Get_Key_Level();
+  57   1          
+  58   1          for(i = 0;i < KEY_NUM;i++)
+  59   1          {
+  60   2              switch(Key_Buf[i].KEY_STATUS)
+  61   2              {
+  62   3                  //×´Ì¬0£ºÃ»ÓÐ°´¼ü°´ÏÂ
+  63   3                  case KEY_NULL:
+  64   3                      if(Key_Buf[i].KEY_LEVEL == 1)//ÓÐ°´¼ü°´ÏÂ
+  65   3                      {
+  66   4                          Key_Buf[i].KEY_STATUS = KEY_SURE;//×ªÈë×´Ì¬1
+  67   4                          Key_Buf[i].KEY_EVENT = KEY_NULL;//¿ÕÊÂ¼þ
+  68   4                      }
+  69   3                      else
+  70   3                      {
+  71   4                          Key_Buf[i].KEY_EVENT = KEY_NULL;//¿ÕÊÂ¼þ
+  72   4                      }
+  73   3                      break;
+  74   3                  //×´Ì¬1£º°´¼ü°´ÏÂÈ·ÈÏ
+  75   3                  case KEY_SURE:
+  76   3                      if(Key_Buf[i].KEY_LEVEL == 1)//È·ÈÏºÍÉÏ´ÎÏàÍ¬
+  77   3                      {
+  78   4                          Key_Buf[i].KEY_STATUS = KEY_DOWN;//×ªÈë×´Ì¬2
+  79   4                          Key_Buf[i].KEY_EVENT = KEY_DOWN;//°´ÏÂÊÂ¼þ
+  80   4                          Key_Buf[i].KEY_COUNT = 0;//¼ÆÊýÆ÷ÇåÁã
+  81   4                          
+  82   4                      }
+  83   3                      else
+  84   3                      {
+  85   4                          Key_Buf[i].KEY_STATUS = KEY_NULL;//×ªÈë×´Ì¬0
+  86   4                          Key_Buf[i].KEY_EVENT = KEY_NULL;//¿ÕÊÂ¼þ
+  87   4                      }
+  88   3                      break;
+  89   3                  //×´Ì¬2£º°´¼ü°´ÏÂ
+  90   3                  case KEY_DOWN:
+  91   3                      if(Key_Buf[i].KEY_LEVEL != 1)//°´¼üÊÍ·Å£¬¶Ë¿Ú¸ßµçÆ½
+  92   3                      {
+  93   4                          Key_Buf[i].KEY_STATUS = KEY_NULL;//×ªÈë×´Ì¬0
+  94   4                          Key_Buf[i].KEY_EVENT = KEY_NULL;//¿ÕÊÂ¼þ
+  95   4                      }
+  96   3                      else if((Key_Buf[i].KEY_LEVEL == 1))//³¬¹ý255Ã»ÓÐÊÍ·Å
+  97   3                      {
+  98   4      //                     Key_Buf[i].KEY_STATUS = KEY_NULL;//×ªÈë×´Ì¬3
+  99   4      //                     Key_Buf[i].KEY_EVENT = KEY_NULL;//³¤°´ÊÂ¼þ
+ 100   4      //                     Key_Buf[i].KEY_COUNT = 0;//¼ÆÊýÆ÷ÇåÁã
+ 101   4                              
+ 102   4                            while(Key_Buf[i].READ_PIN()==0);//µÈ´ý°´¼üÊÍ·Å
+ 103   4                            Key_Buf[i].KEY_STATUS = KEY_NULL;//×ªÈë×´Ì¬0
+ 104   4                            Key_Buf[i].KEY_EVENT = KEY_NULL;//¿ÕÊÂ¼þ
+ 105   4                      }
+ 106   3                      else
+ 107   3                      {
+ 108   4                          Key_Buf[i].KEY_EVENT = KEY_NULL;//¿ÕÊÂ¼þ
+ 109   4                      }
+ 110   3                      break;
+ 111   3                  //×´Ì¬3£º°´¼üÁ¬Ðø°´ÏÂ
+ 112   3      //             case KEY_LONG:
+ 113   3      //                 if(Key_Buf[i].KEY_LEVEL != 1)//°´¼üÊÍ·Å£¬¶Ë¿Ú¸ßµçÆ½
+ 114   3      //                 {
+ 115   3      //                     Key_Buf[i].KEY_STATUS = KEY_NULL;//×ªÈë×´Ì¬0
+C51 COMPILER V9.50a   KEY                                                                  10/27/2019 21:58:17 PAGE 3   
+
+ 116   3      //                     Key_Buf[i].KEY_EVENT = KEY_UP;//ËÉ¿ªÊÂ¼þ
+ 117   3      //                     Key_Buf[i].KEY_EVENT = KEY_NULL;
+ 118   3      //                 }
+ 119   3      //                 else if((Key_Buf[i].KEY_LEVEL == 1) 
+ 120   3      //                 && (++Key_Buf[i].KEY_COUNT >= KEY_LONG_DOWN_DELAY)) //³¬¹ýKEY_LONG_DOWN_DELAYÃ»ÓÐÊÍ·Å
+ 121   3      //                 {
+ 122   3      //                     Key_Buf[i].KEY_EVENT = KEY_LONG;//³¤°´ÊÂ¼þ
+ 123   3      //                     Key_Buf[i].KEY_COUNT = 0;//¼ÆÊýÆ÷ÇåÁã
+ 124   3      //                 }
+ 125   3      //                 else
+ 126   3      //                 {
+ 127   3      //                     Key_Buf[i].KEY_EVENT = KEY_NULL;//¿ÕÊÂ¼þ
+ 128   3      //                 }
+ 129   3      //                 break;
+ 130   3              }
+ 131   2          }
+ 132   1      }
+ 133          
+ 134          
+ 135          //°´¼ü²âÊÔº¯Êý
+ 136          // void Task_KEY_Scan(void)
+ 137          // {
+ 138          //     ReadKeyStatus();
+ 139          //     
+ 140          //     if(Key_Buf[KEY0].KEY_EVENT == KEY_DOWN)
+ 141          //     {
+ 142          //         printf("SW3 Down\n");
+ 143          //     }
+ 144          //     
+ 145          //     if(Key_Buf[KEY1].KEY_EVENT == KEY_DOWN)
+ 146          //     {
+ 147          //         printf("SW4 Down\n");
+ 148          //     }
+ 149          //     
+ 150          //     if(Key_Buf[KEY2].KEY_EVENT == KEY_DOWN)
+ 151          //     {
+ 152          //         printf("SW5 Down\n");
+ 153          //     }
+ 154          //    if(Key_Buf[KEY3].KEY_EVENT == KEY_DOWN)
+ 155          //     {
+ 156          //         printf("SW6 Down\n");
+ 157          //     }
+ 158          
+ 159          // }
+ 160          
+ 161          unsigned char GetKey()
+ 162          {
+ 163   1           ReadKeyStatus();  
+ 164   1          if(Key_Buf[KEY0].KEY_EVENT == KEY_DOWN)
+ 165   1          {
+ 166   2             return 1;
+ 167   2          }
+ 168   1          
+ 169   1          else if(Key_Buf[KEY1].KEY_EVENT == KEY_DOWN)
+ 170   1          {
+ 171   2              return 2;
+ 172   2          }
+ 173   1          
+ 174   1          else if(Key_Buf[KEY2].KEY_EVENT == KEY_DOWN)
+ 175   1          {
+ 176   2              return 3;
+ 177   2          }
+C51 COMPILER V9.50a   KEY                                                                  10/27/2019 21:58:17 PAGE 4   
+
+ 178   1          else if(Key_Buf[KEY3].KEY_EVENT == KEY_DOWN)
+ 179   1          {
+ 180   2              return 4;
+ 181   2          }
+ 182   1          else
+ 183   1          {
+ 184   2              return 0;
+ 185   2          }
+ 186   1      
+ 187   1      }
+ 188          
+ 189          
+ 190          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    375    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     36       2
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

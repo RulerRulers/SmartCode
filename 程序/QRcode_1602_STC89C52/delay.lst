@@ -1,0 +1,69 @@
+C51 COMPILER V9.50a   DELAY                                                                10/27/2019 22:28:19 PAGE 1   
+
+
+C51 COMPILER V9.50a, COMPILATION OF MODULE DELAY
+OBJECT MODULE PLACED IN delay.obj
+COMPILER INVOKED BY: D:\KeilC51\C51\BIN\C51.EXE driver\delay.c BROWSE INCDIR(.\driver) DEBUG OBJECTEXTEND PRINT(.\delay.
+                    -lst) TABS(2) OBJECT(delay.obj)
+
+line level    source
+
+   1          #include "reg52.h"
+   2          #include "delay.h"
+   3          #include "intrins.h"
+   4          
+   5          sbit BEEP = P3^6;
+   6          
+   7          void Delay1ms()   //@11.0592MHz
+   8          {
+   9   1        unsigned char i, j;
+  10   1      
+  11   1        _nop_();
+  12   1        i = 2;
+  13   1        j = 199;
+  14   1        do
+  15   1        {
+  16   2          while (--j);
+  17   2        } while (--i);
+  18   1      }
+  19          
+  20          void delay_us(nus)//us 延时 不是很准确
+  21          {
+  22   1        while(nus--)
+  23   1        {
+  24   2            _nop_();
+  25   2        }
+  26   1      }
+  27          
+  28          
+  29          void delay_ms(unsigned int ums)
+  30          {
+  31   1        while(ums--)
+  32   1        {
+  33   2           Delay1ms();
+  34   2        }
+  35   1      
+  36   1      }
+  37          
+  38          void Beep()
+  39          {
+  40   1        BEEP = 0;
+  41   1        delay_ms(20);
+  42   1        BEEP = 1;
+  43   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     56    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+C51 COMPILER V9.50a   DELAY                                                                10/27/2019 22:28:19 PAGE 2   
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

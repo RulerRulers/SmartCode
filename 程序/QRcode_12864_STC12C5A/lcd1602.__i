@@ -1,0 +1,1 @@
+"driver\lcd1602.c" BROWSE INCDIR(.\driver) DEBUG OBJECTEXTEND PRINT(.\lcd1602.lst) TABS (2) OBJECT(lcd1602.obj)

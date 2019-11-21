@@ -1,0 +1,109 @@
+C51 COMPILER V9.50a   UART                                                                 11/04/2019 21:13:59 PAGE 1   
+
+
+C51 COMPILER V9.50a, COMPILATION OF MODULE UART
+OBJECT MODULE PLACED IN uart.obj
+COMPILER INVOKED BY: D:\KeilC51\C51\BIN\C51.EXE driver\uart.c BROWSE INCDIR(.\driver) DEBUG OBJECTEXTEND PRINT(.\uart.ls
+                    -t) TABS(2) OBJECT(uart.obj)
+
+line level    source
+
+   1          #include "reg52.h"
+   2          #include "delay.h"
+   3          #include "uart.h"
+   4          #include "stdio.h"
+   5          
+   6          unsigned char xdata Receive_Data[100];//缓冲数组
+   7          unsigned char uart_len = 0;//串口接收字节数量
+   8          unsigned char receive_ok = 0;//接受完成标志位
+   9          
+  10          void UartInit(void)   //115200bps@11.0592MHz
+  11          {
+  12   1         SCON=0x50;   
+  13   1         TH2=0xFF;           
+  14   1         TL2=0xFD;   
+  15   1         RCAP2H=0xFF;   
+  16   1         RCAP2L=0xFD; 
+  17   1      
+  18   1      /*****************/
+  19   1         TCLK=1;   
+  20   1         RCLK=1;   
+  21   1         C_T2=0;   
+  22   1         EXEN2=0;
+  23   1      
+  24   1      /*****************/
+  25   1         TR2=1 ;
+  26   1        
+  27   1         ES = 1;       //串口中断使能
+  28   1         TI = 1;       //发送中断标记位，必须设置 这两句是为了使用printf函数 如果不使用printf函数 则可以去掉
+  29   1         EA = 1;    //开放总中断
+  30   1      }
+  31          
+  32          /****************串行口1发送****************/  
+  33          void UART1_SendOneByte(unsigned char c)  
+  34          {  
+  35   1          SBUF = c;  
+  36   1          while(!TI);    //若TI=0，在此等待  
+  37   1          TI = 0;    
+  38   1      }  
+  39          
+  40          /*
+  41           * putchar (mini version): outputs charcter only
+  42           */
+  43          char putchar (char c) 
+  44          {
+  45   1        while (!TI);
+  46   1        TI = 0;
+  47   1        return (SBUF = c);
+  48   1      }
+  49          
+  50          //判断串口是否接收完一帧数据
+  51          void Is_Receive_Ok(unsigned char *len)
+  52          {
+  53   1        unsigned char rxlen=uart_len;
+  54   1        unsigned char i=0;
+C51 COMPILER V9.50a   UART                                                                 11/04/2019 21:13:59 PAGE 2   
+
+  55   1        *len=0;       //默认为0
+  56   1         delay_ms(1);   //等待10ms,连续超过10ms没有接收到一个数据,则认为接收结束 
+  57   1        if(rxlen==uart_len&&rxlen)//接收到了数据,且接收完成了
+  58   1        {
+  59   2          *len=uart_len;  //记录本次数据长度
+  60   2          uart_len=0;     //清零
+  61   2          receive_ok = 1;//接收完成 
+  62   2        }
+  63   1      }
+  64          
+  65          void UART_Receive() interrupt 4
+  66          {
+  67   1       if(RI==1)//RI为接受中断标志，可能是发送产生的中断
+  68   1       {
+  69   2        ES=0;     //关串口中断
+  70   2        RI=0;//接受中断标志软件清零 
+  71   2        if(receive_ok == 0)
+  72   2        {
+  73   3            if(uart_len>=50) 
+  74   3            {
+  75   4              ES=1;     //开串口中断  
+  76   4              uart_len =0;  
+  77   4              return;
+  78   4            }       
+  79   3            Receive_Data[uart_len++]=SBUF;//将接受数据放入预置数组 
+  80   3        }
+  81   2        ES=1;     //开串口中断
+  82   2       } 
+  83   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    162    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =    100    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      2       5
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

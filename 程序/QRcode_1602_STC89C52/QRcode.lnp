@@ -1,0 +1,6 @@
+"uart.obj",
+"main.obj",
+"delay.obj",
+"lcd1602.obj" 
+TO "QRcode" 
+RAMSIZE(256) 

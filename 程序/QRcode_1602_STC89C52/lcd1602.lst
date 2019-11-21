@@ -1,0 +1,98 @@
+C51 COMPILER V9.50a   LCD1602                                                              11/06/2019 20:54:58 PAGE 1   
+
+
+C51 COMPILER V9.50a, COMPILATION OF MODULE LCD1602
+OBJECT MODULE PLACED IN lcd1602.obj
+COMPILER INVOKED BY: D:\KeilC51\C51\BIN\C51.EXE driver\lcd1602.c BROWSE INCDIR(.\driver) DEBUG OBJECTEXTEND PRINT(.\lcd1
+                    -602.lst) TABS(2) OBJECT(lcd1602.obj)
+
+line level    source
+
+   1          #include "reg52.h"
+   2          #include "stdio.h"
+   3          #include "intrins.h"
+   4          #include "delay.h"
+   5          #include "lcd1602.h"
+   6          
+   7          sbit lcdrs  = P0^7; //液晶引脚定义
+   8          sbit led_cs = P0^6;
+   9          sbit lcden  = P0^5;
+  10          
+  11          /*延时函数*/
+  12          void delay(unsigned int xms)
+  13          {
+  14   1        unsigned int i,j; 
+  15   1        for(i=xms;i>0;i--)
+  16   1        for(j=110;j>0;j--);
+  17   1      }
+  18          /*1602液晶*/
+  19          void write_com(unsigned char com)//写命令
+  20          {
+  21   1        lcdrs=0;
+  22   1        lcden=0;
+  23   1        P2=com;
+  24   1        delay(5);
+  25   1        lcden=1;
+  26   1        delay(5);
+  27   1        lcden=0;
+  28   1      }
+  29          void write_data(unsigned char date)//写数据
+  30          {
+  31   1        lcdrs=1;
+  32   1        lcden=0;
+  33   1        P2=date;
+  34   1        delay(5);
+  35   1        lcden=1;
+  36   1        delay(5);
+  37   1        lcden=0;
+  38   1      }
+  39          void write_by_xy(unsigned char x,unsigned char y)//坐标定位
+  40          {
+  41   1        unsigned char address;
+  42   1        if(y==0) 
+  43   1        address=0x80+x;//y=0,写第一行
+  44   1        else 
+  45   1        address=0xc0+x;//y=1,写第二行
+  46   1        write_com(address); 
+  47   1      }
+  48          /*void write_char(unsigned char x,unsigned char y,unsigned char date)//坐标定位显示
+  49          {
+  50            write_by_xy(x,y);//先定位 
+  51            write_data(date);//后写数
+  52          }*/
+  53          
+  54          void write_string(unsigned char x,unsigned char y,unsigned char *s,unsigned char len)//写字符串
+C51 COMPILER V9.50a   LCD1602                                                              11/06/2019 20:54:58 PAGE 2   
+
+  55          {
+  56   1        write_by_xy(x,y);//设定显示位置 
+  57   1        while(len--)//write character
+  58   1        {
+  59   2            P2=*s;
+  60   2            write_data(*s); 
+  61   2            s++;
+  62   2        }
+  63   1      }
+  64          
+  65          void init_1602()//初始化
+  66          {
+  67   1        led_cs=0;
+  68   1        write_com(0x38);
+  69   1        write_com(0x0c);
+  70   1        write_com(0x06);
+  71   1        write_com(0x01);
+  72   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    148    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----       6
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
