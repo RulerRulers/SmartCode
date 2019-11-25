@@ -3,7 +3,29 @@
 <pre>
 <h1>礦ision Build Log</h1>
 <h2>Project:</h2>
-C:\Users\Administrator\Desktop\个人项目\智能扫码设备\QRcode\QRcode.uvproj
+C:\Users\Administrator\Desktop\个人项目\智能扫码设备\程序\QRcode_1602_STC89C52\QRcode.uvproj
 Project File Date:  11/03/2019
 
 <h2>Output:</h2>
+Build target 'Target 1'
+linking...
+*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
+    SEGMENT: ?PR?_UART1_SENDONEBYTE?UART
+*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
+    SEGMENT: ?PR?_PUTCHAR?UART
+*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
+    SEGMENT: ?PR?BEEP?DELAY
+Program Size: data=22.0 xdata=100 code=727
+creating hex file from "QRcode"...
+"QRcode" - 0 Error(s), 3 Warning(s).
+Build target 'Target 1'
+linking...
+*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
+    SEGMENT: ?PR?_UART1_SENDONEBYTE?UART
+*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
+    SEGMENT: ?PR?_PUTCHAR?UART
+*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
+    SEGMENT: ?PR?BEEP?DELAY
+Program Size: data=22.0 xdata=100 code=727
+creating hex file from "QRcode"...
+"QRcode" - 0 Error(s), 3 Warning(s).

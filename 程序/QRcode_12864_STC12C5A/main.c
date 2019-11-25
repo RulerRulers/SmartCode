@@ -1,67 +1,83 @@
-#include "reg52.h"
+#include "config.h"
 #include "stdio.h"
+#include "string.h"
 #include "uart.h"
 #include "intrins.h"
 #include "delay.h"
-#include "lcd1602.h"
+#include "lcd12864.h"
+#include "timer.h"
+#include "QRcoder.h"
+#include "key.h"
 
-sbit LED = P1^0;//LED
+unsigned char  rxlengh = 0;//串口接收数据长度
+unsigned char flag_waitPay = 0;//等待支付才可以按键操作
+unsigned char keyValue = 0;//键值
+
+//语音播放控制脚
 sbit Voice = P1^1;
-sbit BEEP = P3^6 ;   //蜂鸣器
-unsigned char  rxlengh = 0; 
-unsigned char  Count1,Count2,flag;
-void Timer0_init();
+void Voice_player(void);
 
 void main()
 {
 	 unsigned char i = 0;
-   UartInit();//115200
-	 init_1602();//初始化LCD1602
-	 Timer0_init();
-	 write_string(0,0,"QR code:",8);
+	 USART2_Init();//串口2 115200 二维码模块串口
+	 Timer0Init();//定时器初始化
+	 LCD12864_init();//LCD12864 初始化
+	 LcdDiplay_MainWindow();
+ 
 	 while(1)
 	 {
      Is_Receive_Ok(&rxlengh);//判断串口是否接收完成
 		 if(rxlengh !=0)
 		 {
-			 if(rxlengh <= 20) 
+			 if(strstr(Receive_Data,"0001")!=NULL)
 			 {
-			   write_string(0,1,Receive_Data,16);//在屏幕上显示解码后的数据
-				 Voice = 0; 
-				 delay_us(10);
-				 Voice = 1; 	
-			 }				 
-			 else
-			 {  				 
-				 write_string(0,1,"QRcode too large",16);//码太长 无法显示
-			 }
-			 TR0 = 1;
-			 delay_ms(30);
-			 TR0 = 0;       		 
+          LcdDispy_productInfo(&productInfo[0]);
+       }
+			 else if(strstr(Receive_Data,"0002")!=NULL)
+			 {
+          LcdDispy_productInfo(&productInfo[1]);  
+       }
+			  else if(strstr(Receive_Data,"0003")!=NULL)
+			 {
+          LcdDispy_productInfo(&productInfo[2]);
+       }
+			 else if(strstr(Receive_Data,"0004")!=NULL)
+			 {
+          LcdDispy_productInfo(&productInfo[3]);
+       }
+			 else if(strstr(Receive_Data,"0005")!=NULL)
+			 {
+          LcdDispy_productInfo(&productInfo[4]);
+       }
+		
+       Voice_player();	
+       flag_waitPay = 1;//进入等待支付状态			 
 			 receive_ok = 0;
+			 memset(Receive_Data,0,sizeof(Receive_Data));
 			 uart_len = 0;//标志位清0 开启下一次接收
      }
-		 LED = !LED; //LED闪烁 表示系统正在运行
-		 
+		 keyValue = GetKey();
+		 if(keyValue == 1 && flag_waitPay==1)//支付键按下 S4
+		 {
+         LcdDiplay_PayWindow();
+			   flag_waitPay = 0;
+			   keyValue = 0;
+     }
+		 else if(keyValue == 4 && flag_waitPay==1)//取消支付键按下  s1
+		 {
+         LcdDiplay_CancelWindow();//取消支付
+			   flag_waitPay = 0;
+			   keyValue = 0;
+     }
    }
 }
 
-void Timer0_init()
-{
-   TMOD=0x01; 
-   TH0=0xfc; 
-   TL0=0x66;      //1ms定时 
-   EA=1; 
-   ET0=1; 
-}
 
-
-/*********************************************************
-  Time0中断函数
-**********************************************************/
-void Time0(void) interrupt 1 using 0
+//语音播放
+void Voice_player()
 {
-   TH0=0xfc;               //1ms定时
-   TL0=0x66;
-   BEEP=~BEEP;  	 
+	 Voice = 0; 
+	 delay_us(10);
+	 Voice = 1; 
 }

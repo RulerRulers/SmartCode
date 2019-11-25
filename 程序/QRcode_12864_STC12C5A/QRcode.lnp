@@ -1,6 +1,9 @@
 "uart.obj",
 "main.obj",
 "delay.obj",
-"lcd1602.obj" 
+"lcd12864.obj",
+"timer.obj",
+"QRcoder.obj",
+"key.obj" 
 TO "QRcode" 
 RAMSIZE(256) 

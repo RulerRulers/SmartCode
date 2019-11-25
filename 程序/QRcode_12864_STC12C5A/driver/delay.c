@@ -7,10 +7,9 @@ sbit BEEP = P3^6;
 void Delay1ms()		//@11.0592MHz
 {
 	unsigned char i, j;
-
 	_nop_();
-	i = 2;
-	j = 199;
+	i = 11;
+	j = 190;
 	do
 	{
 		while (--j);
@@ -19,10 +18,7 @@ void Delay1ms()		//@11.0592MHz
 
 void delay_us(nus)//us 延时 不是很准确
 {
-  while(nus--)
-	{
-			_nop_();
-  }
+  _nop_();
 }
 
 
@@ -35,9 +31,3 @@ void delay_ms(unsigned int ums)
 
 }
 
-void Beep()
-{
-  BEEP = 0;
-	delay_ms(20);
-	BEEP = 1;
-}

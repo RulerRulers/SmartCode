@@ -43,7 +43,8 @@ extern KEY_COMPONENTS Key_Buf[KEY_NUM];
 
 
 void Task_KEY_Scan(void);//°´¼ü²âÊÔ
-unsigned char GetKey();
+void ReadKeyStatus(void);  
+unsigned char GetKey(void);
 
 
 

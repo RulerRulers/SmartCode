@@ -297,7 +297,7 @@
               <MiscControls></MiscControls>
               <Define></Define>
               <Undefine></Undefine>
-              <IncludePath>.\driver</IncludePath>
+              <IncludePath>.\driver;.\config</IncludePath>
             </VariousControls>
           </C51>
           <Ax51>
@@ -350,11 +350,6 @@
           <GroupName>Source Group 1</GroupName>
           <Files>
             <File>
-              <FileName>key.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\driver\key.c</FilePath>
-            </File>
-            <File>
               <FileName>uart.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\driver\uart.c</FilePath>
@@ -370,9 +365,19 @@
               <FilePath>.\driver\delay.c</FilePath>
             </File>
             <File>
-              <FileName>lcd1602.c</FileName>
+              <FileName>lcd12864.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\driver\lcd1602.c</FilePath>
+              <FilePath>.\driver\lcd12864.c</FilePath>
+            </File>
+            <File>
+              <FileName>timer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\driver\timer.c</FilePath>
+            </File>
+            <File>
+              <FileName>QRcoder.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\QRcoder.c</FilePath>
             </File>
           </Files>
         </Group>
