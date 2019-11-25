@@ -1,0 +1,126 @@
+C51 COMPILER V9.50a   LCD12864                                                             11/25/2019 21:04:01 PAGE 1   
+
+
+C51 COMPILER V9.50a, COMPILATION OF MODULE LCD12864
+OBJECT MODULE PLACED IN lcd12864.obj
+COMPILER INVOKED BY: D:\KeilC51\C51\BIN\C51.EXE driver\lcd12864.c BROWSE INCDIR(.\driver;.\config) DEBUG OBJECTEXTEND PR
+                    -INT(.\lcd12864.lst) TABS(2) OBJECT(lcd12864.obj)
+
+line level    source
+
+   1          #include "lcd12864.h"
+   2          #include "intrins.h"
+   3          #include "stdio.h"
+   4          
+   5          void delay(unsigned int t)
+   6          {
+   7   1        unsigned int i;
+   8   1        while(t--)
+   9   1          for(i=0;i<110;i++);
+  10   1      }
+  11           
+  12          bit busy()  //查忙
+  13          {
+  14   1        bit result;
+  15   1        LCD_DAT=0X00; 
+  16   1        RS=0;     //命令/数据选择,为0时选择命令    
+  17   1        RW=1;     //读/写选择，为1时选择读
+  18   1        E=1;      //使能
+  19   1        delay(1);
+  20   1        result = (bit)(LCD_DAT&0x80); //查忙标志位，等待标志位为0，即表示写入完毕
+  21   1        E=0;      //关闭读写 
+  22   1        return (result);
+  23   1      }
+  24           
+  25          void wcode(unsigned char cmd)   //向lcd写一命令
+  26          {
+  27   1        while(busy());             //查忙
+  28   1        RS=0;              //命令/数据选择,为0时选择命令 
+  29   1        RW=0;              //读/写选择，为0时选择写
+  30   1        E=0;
+  31   1        _nop_();
+  32   1        _nop_(); 
+  33   1        LCD_DAT=cmd;         //送入命令
+  34   1        delay(1);       //等待
+  35   1        E=1;              
+  36   1        delay(1);
+  37   1        E=0;
+  38   1      }
+  39           
+  40          void wdata(unsigned char dat)   //向LCD写一数据
+  41          {
+  42   1        while(busy());
+  43   1        RS=1;            //H为数据
+  44   1        RW=0;
+  45   1        E=0;
+  46   1        LCD_DAT=dat;
+  47   1        delay(1);
+  48   1        E=1;
+  49   1        delay(1);
+  50   1        E=0;
+  51   1      }
+  52           
+  53          void LCD12864_init()    //LCD初始化
+  54          {
+C51 COMPILER V9.50a   LCD12864                                                             11/25/2019 21:04:01 PAGE 2   
+
+  55   1        PSB=1;     //设置为8BIT并口工作模式  H并行 L串行
+  56   1        delay(10);
+  57   1        wcode(0x34);
+  58   1        delay(5);
+  59   1        wcode(0x30);  //选择基本指令集
+  60   1        delay(5);
+  61   1        wcode(0x0c);  //开显示，无游标
+  62   1        delay(5);
+  63   1        wcode(0x01);  //清除显示，并且设定地址指针为00H
+  64   1        delay(5);
+  65   1        wcode(0x06);  //指定在资料的读取及写入时，设定游标的移动方向及指定显示的移位
+  66   1        
+  67   1      }
+  68          
+  69          void Lcd_Clear(unsigned char mode)//LCD 清屏 mode=0 字符模式下清屏  mpode=1 绘图模式下清屏
+  70          {
+  71   1         if(mode==0)
+  72   1         {
+  73   2            //wcode(0x01);  //清除显示，并且设定地址指针为00H
+  74   2            LCD12864_init();
+  75   2         }
+  76   1      }
+  77           
+  78          void LcdShow_string(unsigned char x,unsigned char y,unsigned char  *s)  //任意位置显示字符串
+  79          {                         //x为横坐标，y位纵坐标，*s表示指针，为数据的首地址
+  80   1        switch(y)               //选择纵坐标
+  81   1        {
+  82   2          case 0:wcode(0x80+x);break;  //第一行
+  83   2          case 1:wcode(0x90+x);break;  //第二行
+  84   2          case 2:wcode(0x88+x);break;  //第三行
+  85   2          case 3:wcode(0x98+x);break;  //第四行
+  86   2          default:break;
+  87   2        }
+  88   1        while(*s>0)                    //写入数据，直到数据为空
+  89   1        {
+  90   2          wdata(*s);                   //写数据
+  91   2          delay(10);                  //下一字符
+  92   2          s++;
+  93   2        }
+  94   1      }  
+  95          void LcdShow_number(unsigned char x,unsigned char y, unsigned int n)  //lcd显示一个数字
+  96          {
+  97   1        char s[6];
+  98   1        sprintf(s,"%d",n);
+  99   1        LcdShow_string(x,y,s);  
+ 100   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    309    ----
+   CONSTANT SIZE    =      3    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----      12
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----       1
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

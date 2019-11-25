@@ -1,0 +1,90 @@
+C51 COMPILER V9.50a   QRCODER                                                              11/25/2019 21:04:01 PAGE 1   
+
+
+C51 COMPILER V9.50a, COMPILATION OF MODULE QRCODER
+OBJECT MODULE PLACED IN QRcoder.OBJ
+COMPILER INVOKED BY: D:\KeilC51\C51\BIN\C51.EXE QRcoder.c BROWSE INCDIR(.\driver;.\config) DEBUG OBJECTEXTEND TABS(2)
+
+line level    source
+
+   1          #include "config.h"
+   2          #include "lcd12864.h"
+   3          #include "QRcoder.h"
+   4          #include "stdio.h"
+   5          #include "string.h"
+   6          #include "uart.h"
+   7          #include "delay.h"
+   8          
+   9          
+  10            
+  11          //商品信息
+  12          ProductDef code productInfo[]=
+  13          {
+  14            {"8641983220190001","冰红茶",3},
+  15            {"8641983220190002","面包",3},
+  16            {"8641983220190003","纸巾",1},
+  17            {"8641983220190004","牙刷",5},
+  18            {"8641983220190005","洗发水",15}, 
+  19          };
+  20          
+  21          void LcdDiplay_MainWindow()
+  22          {
+  23   1        Lcd_Clear(0); //清除显示，并且设定地址指针为00H
+  24   1        LcdShow_string(0,0,"====欢迎使用====");
+  25   1        LcdShow_string(1,1,"智能扫码设备");
+  26   1        LcdShow_string(0,2,"----请扫码----");
+  27   1        LcdShow_string(0,3,"Design  By  XXX");
+  28   1      }
+  29          
+  30          //显示商品信息
+  31          void LcdDispy_productInfo(ProductDef* proInfo)
+  32          {
+  33   1        unsigned char dest[12];
+  34   1        Lcd_Clear(0); //清除显示，并且设定地址指针为00H
+  35   1        strncpy(dest,proInfo->QR,12);
+  36   1        LcdShow_string(0,0,"QR:");
+  37   1        LcdShow_string(2,0,dest);//第一行显示二维码
+  38   1        
+  39   1        LcdShow_string(0,1,"品名:");
+  40   1        LcdShow_string(3,1,proInfo->name);//第二行显示商品名称
+  41   1        
+  42   1        LcdShow_string(0,2,"价格:");
+  43   1        LcdShow_number(3,2,proInfo->price);//第三行显示商品价格
+  44   1        LcdShow_string(5,2,"元");
+  45   1        
+  46   1        LcdShow_string(0,3,"----请支付----");
+  47   1      }
+  48          
+  49          void LcdDiplay_PayWindow()
+  50          {
+  51   1         Lcd_Clear(0);  //清除显示
+  52   1         LcdShow_string(2,1,"支付成功！");//第二行显示商品名称
+  53   1         LcdShow_string(0,3,"3 秒后自动返回");//第二行显示商品名称
+  54   1         delay_ms(3000);
+  55   1         LcdDiplay_MainWindow();
+C51 COMPILER V9.50a   QRCODER                                                              11/25/2019 21:04:01 PAGE 2   
+
+  56   1      }
+  57          
+  58          void LcdDiplay_CancelWindow()
+  59          {
+  60   1         Lcd_Clear(0);  //清除显示
+  61   1         LcdShow_string(2,1,"取消支付");//第二行显示商品名称
+  62   1         LcdShow_string(0,3,"2 秒后自动返回");//第二行显示商品名称
+  63   1         delay_ms(2000);
+  64   1         LcdDiplay_MainWindow();
+  65   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    290    ----
+   CONSTANT SIZE    =    270    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----      15
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
